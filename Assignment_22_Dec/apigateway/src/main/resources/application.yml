@@ -1,0 +1,32 @@
+server:
+  port: 8094
+
+spring:
+  application:
+    name: apigateway
+  cloud:
+    gateway:
+      routes:
+        - id: authservice
+          uri: lb://authservice
+          predicates:
+            - Path=/authservice/**
+          filters:
+            - StripPrefix=1
+        - id: productservice
+          uri: lb://productservice
+          predicates:
+            - Path=/productservice/**
+          filters:
+            - StripPrefix=1
+        - id: consumerservice
+          uri: lb://consumerservice
+          predicates:
+            - Path=/consumerservice/**
+          filters:
+            - StripPrefix=1
+            
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:1111/eureka/            

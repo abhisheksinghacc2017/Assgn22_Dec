@@ -1,0 +1,127 @@
+
+Eureka Server : http://localhost:1111/
+
+4 Microservices :
+	1) AuthenticationService    (Swagger Url :  http://localhost:8096/swagger-ui/index.html#/ )
+	2) Product Service		    (Swagger Url :  http://localhost:2222/swagger-ui/index.html# )
+	3) Consumer Service         (Swagger Url :  http://localhost:8098/swagger-ui/index.html#/ )
+	3) API Gateway              (Runs on 8094 port)
+	
+	
+	
+	
+TWO Roles are there : 
+	1)  ADMIN     : Can add the product   
+	2)  CUSTOMER  : Can select the product and see the list of selected products	
+
+------ AuthenticationService ----  
+
+	create user : 
+				http://localhost:8096/user/save  POST  
+				
+				{
+					"username":"admin",
+					"password":"admin",
+					"role":"ROLE_ADMIN"
+				}
+
+	
+	Get All Registered Users :
+				http://localhost:8096/user/users GET   (Get all registered user)
+	
+	
+	Login :  (This will return jwt token in response Authorization header)
+				http://localhost:8096/auth/login  POST
+				{
+					"username":"admin",
+					"password":"admin"
+				}
+
+
+
+---- PRODUCT Service ----------
+
+	- ADMIN can ADD , UPDATE & DELETE the product
+
+					Save Product :   
+							http://localhost:2222/admin/save  POST (Place Jwt token Authorization header in request)
+									
+									Payload :
+									{
+									  "name": "Jeans",
+									  "description": "Mens wear Jeans",
+									  "price": 1600
+									}
+							
+
+
+					Update Product : 
+							http://localhost:2222/admin/update  PUT (Place Jwt token  Authorization header in request)
+									
+									Payload :
+									{
+									  "productId": 1,
+									  "name": "Jeans",
+									  "description": "Mens wear Jeans",
+									  "price": 1600
+									}
+
+
+					Delete Product :
+							http://localhost:2222/admin/del/1  DELETE  (Place Jwt token  Authorization header in request)
+					
+					
+	
+	- LIST of products :  ADMIN & CUSTOMER roles can see the list of all products
+	
+					http://localhost:2222/shop/products   GET  (Place Jwt token  Authorization header in request)
+				
+					
+					
+	- SELECT product :  Only CUSTOMER role can select the product :  It pushes the selected product in MQ
+	
+					http://localhost:2222/product/select/1    GET  (Place Jwt token  Authorization header in request)
+
+					
+	
+	
+	
+	
+------- Consumer Service -----------------
+
+	This service reads the MQ (where selected products are pushed) and stores them in database.
+
+	- LIST OF SELECTED PRODUCTS :  ADMIN & CUSTOMER role can see the selected products.
+
+				http://localhost:8098/selected/products   GET  (Place Jwt token  Authorization header in request)
+
+
+	
+
+----- API Gateway Runs on port 8094 ------
+
+	Three route paths : 
+				- authservice     :  http://localhost:8094/authservice/     .... 
+				- productservice  :  http://localhost:8094/productservice/  ....
+				- consumerservice :  http://localhost:8094/consumerservice/ ....
+				
+				 Ex : Health check urls from api gateway :
+										http://localhost:8094/authservice/user/health
+										http://localhost:8094/productservice/app/health
+										http://localhost:8094/consumerservice/app/health
+										
+				
+				
+				
+
+				
+				
+				
+	
+	
+	
+
+
+
+
+
